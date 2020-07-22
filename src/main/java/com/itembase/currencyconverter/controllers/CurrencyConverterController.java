@@ -1,4 +1,4 @@
-package com.itembase.currencyconverter.controller;
+package com.itembase.currencyconverter.controllers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
