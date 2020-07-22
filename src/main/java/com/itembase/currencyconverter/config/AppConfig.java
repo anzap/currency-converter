@@ -11,27 +11,21 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class AppConfig {
-	
-	private final ProvidersConfig providers;
-	
-	@Getter
-	@RequiredArgsConstructor
-	public static class ProvidersConfig {
-		private final ExchangeRatesApiIOConfig exchangeRatesApiIO;
-		
-		private final ExchangeRatesApiComConfig exchangeRatesApiCom;
-		
-	}
-	
-	@Getter
-	@RequiredArgsConstructor
-	public static class ExchangeRatesApiIOConfig {
-		private final String baseurl;
-	}
-	
-	@Getter
-	@RequiredArgsConstructor
-	public static class ExchangeRatesApiComConfig {
-		private final String baseurl;
-	}
+
+  private final Providers providers;
+
+  @Getter
+  @RequiredArgsConstructor
+  public static class Providers {
+    private final ProviderConfig exchangeRatesApiIO;
+
+    private final ProviderConfig exchangeRatesApiCom;
+  }
+
+  @Getter
+  @RequiredArgsConstructor
+  public static class ProviderConfig {
+    private final String baseurl;
+    private final Long timeout;
+  }
 }

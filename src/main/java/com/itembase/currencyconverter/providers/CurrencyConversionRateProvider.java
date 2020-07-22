@@ -5,5 +5,5 @@ import java.math.BigDecimal;
 import reactor.core.publisher.Mono;
 
 public interface CurrencyConversionRateProvider {
-	Mono<BigDecimal> conversionRate();
+  Mono<BigDecimal> conversionRate(String from, String to);
 }

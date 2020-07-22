@@ -6,8 +6,8 @@ import lombok.Value;
 
 @Value
 public class ConversionResponse {
-	private String from;
-	private String to;
-	private BigDecimal amount;
-	private BigDecimal converted;
+  private String from;
+  private String to;
+  private BigDecimal amount;
+  private BigDecimal converted;
 }

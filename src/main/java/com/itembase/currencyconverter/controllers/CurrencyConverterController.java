@@ -2,11 +2,10 @@ package com.itembase.currencyconverter.controllers;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-import java.math.BigDecimal;
-
 import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,12 +24,18 @@ import reactor.core.publisher.Mono;
 @Validated
 @RequiredArgsConstructor
 public class CurrencyConverterController {
-	
-	private final CurrencyConverterService service;
-	
-	@PostMapping(path = "/convert", consumes = MediaType.APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-	public Mono<ConversionResponse> convert(@RequestBody @Valid ConversionRequest request) {
-		service.convert();
-		return Mono.just(new ConversionResponse("USD", "EUR", new BigDecimal(1.0), new BigDecimal(0.9)));
-	}
+
+  private final CurrencyConverterService service;
+
+  @PostMapping(
+      path = "/convert",
+      consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = APPLICATION_JSON_VALUE)
+  public Mono<ResponseEntity<ConversionResponse>> convert(
+      @RequestBody @Valid ConversionRequest request) {
+    return service
+        .convert(request)
+        .map(r -> ResponseEntity.ok(r))
+        .onErrorReturn(ResponseEntity.status(503).build());
+  }
 }
