@@ -3,6 +3,7 @@ package com.itembase.currencyconverter.services;
 import java.math.BigDecimal;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import org.springframework.stereotype.Service;
@@ -33,19 +34,24 @@ public class CurrencyConverterService {
                 providers
                     .get(providers.size() - 1 - randomIndex)
                     .conversionRate(request.getFrom(), request.getTo()))
+        .log()
         .map(r -> conversionResponseMapper.apply(request, r));
   }
 
-  BiFunction<ConversionRequest, BigDecimal, ConversionResponse> conversionResponseMapper =
-      new BiFunction<ConversionRequest, BigDecimal, ConversionResponse>() {
+  BiFunction<ConversionRequest, Optional<BigDecimal>, ConversionResponse> conversionResponseMapper =
+      new BiFunction<ConversionRequest, Optional<BigDecimal>, ConversionResponse>() {
 
         @Override
-        public ConversionResponse apply(ConversionRequest request, BigDecimal rate) {
+        public ConversionResponse apply(ConversionRequest request, Optional<BigDecimal> rate) {
+          if (rate.isEmpty()) {
+        	  throw new RuntimeException("No rate provided!");
+          }
+
           return new ConversionResponse(
               request.getFrom(),
               request.getTo(),
               request.getAmount(),
-              request.getAmount().multiply(rate));
+              request.getAmount().multiply(rate.get()));
         }
       };
 }

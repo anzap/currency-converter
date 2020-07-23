@@ -3,6 +3,7 @@ package com.itembase.currencyconverter.providers.exchangeratesapicom;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -27,7 +28,7 @@ public class ExchangeRatesApiComProvider implements CurrencyConversionRateProvid
   private final AppConfig config;
 
   @Override
-  public Mono<BigDecimal> conversionRate(String from, String to) {
+  public Mono<Optional<BigDecimal>> conversionRate(String from, String to) {
 
     return client()
         .get()
@@ -36,7 +37,7 @@ public class ExchangeRatesApiComProvider implements CurrencyConversionRateProvid
         .retrieve()
         .bodyToMono(ApiResponse.class)
         .log()
-        .map(r -> r.getRates().get(to));
+        .map(r -> Optional.ofNullable(r.getRates().get(to)));
   }
 
   private WebClient client() {
