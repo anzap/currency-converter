@@ -1,31 +1,27 @@
 package com.itembase.currencyconverter.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConstructorBinding;
+import java.security.SecureRandom;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@ConfigurationProperties(prefix = "app")
-@ConstructorBinding
-@Getter
-@RequiredArgsConstructor
+@Configuration
 public class AppConfig {
 
-  private final Providers providers;
+  @Bean
+  public RandomGenerator randomGenerator() {
+    return new RandomGenerator() {
 
-  @Getter
-  @RequiredArgsConstructor
-  public static class Providers {
-    private final ProviderConfig exchangeRatesApiIO;
+      SecureRandom random = new SecureRandom();
 
-    private final ProviderConfig exchangeRatesApiCom;
+      @Override
+      public int random(int bound) {
+        return random.nextInt(bound);
+      }
+    };
   }
 
-  @Getter
-  @RequiredArgsConstructor
-  public static class ProviderConfig {
-    private final String baseurl;
-    private final Long timeout;
+  public interface RandomGenerator {
+    int random(int bound);
   }
 }

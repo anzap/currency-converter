@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -36,6 +37,7 @@ public class CurrencyConverterController {
     return service
         .convert(request)
         .map(r -> ResponseEntity.ok(r))
-        .onErrorReturn(ResponseEntity.status(503).build());
+        .onErrorReturn(ResponseEntity.status(HttpStatus.BAD_GATEWAY).build());
   }
+
 }

@@ -10,7 +10,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.itembase.currencyconverter.config.AppConfig;
+import com.itembase.currencyconverter.config.AppProperties;
 import com.itembase.currencyconverter.providers.CurrencyConversionRateProvider;
 
 import io.netty.channel.ChannelOption;
@@ -25,7 +25,7 @@ import reactor.netty.tcp.TcpClient;
 @RequiredArgsConstructor
 public class ExchangeRatesApiIOProvider implements CurrencyConversionRateProvider {
 
-  private final AppConfig config;
+  private final AppProperties config;
 
   @Override
   public Mono<Optional<BigDecimal>> conversionRate(String from, String to) {

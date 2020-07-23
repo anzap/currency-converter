@@ -1,13 +1,13 @@
 package com.itembase.currencyconverter.services;
 
 import java.math.BigDecimal;
-import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 import org.springframework.stereotype.Service;
 
+import com.itembase.currencyconverter.config.AppConfig.RandomGenerator;
 import com.itembase.currencyconverter.dtos.ConversionRequest;
 import com.itembase.currencyconverter.dtos.ConversionResponse;
 import com.itembase.currencyconverter.providers.CurrencyConversionRateProvider;
@@ -21,10 +21,10 @@ public class CurrencyConverterService {
 
   private final List<CurrencyConversionRateProvider> providers;
 
-  private final SecureRandom random = new SecureRandom();
+  private final RandomGenerator randomGenerator;
 
   public Mono<ConversionResponse> convert(ConversionRequest request) {
-    int randomIndex = random.nextInt(providers.size());
+    int randomIndex = randomGenerator.random(providers.size());
     CurrencyConversionRateProvider rateProvider = providers.get(randomIndex);
 
     return rateProvider
@@ -51,7 +51,7 @@ public class CurrencyConverterService {
               request.getFrom(),
               request.getTo(),
               request.getAmount(),
-              request.getAmount().multiply(rate.get()));
+              request.getAmount().multiply(rate.get()).stripTrailingZeros());
         }
       };
 }
