@@ -6,11 +6,13 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.itembase.currencyconverter.config.AppProperties;
+import com.itembase.currencyconverter.exceptions.BusinessException;
 import com.itembase.currencyconverter.providers.CurrencyConversionRateProvider;
 
 import io.netty.channel.ChannelOption;
@@ -35,6 +37,20 @@ public class ExchangeRatesApiIOProvider implements CurrencyConversionRateProvide
         .uri(uriBuilder -> uriBuilder.queryParam("base", from).queryParam("symbols", to).build())
         .accept(APPLICATION_JSON)
         .retrieve()
+        .onStatus(
+            HttpStatus::is4xxClientError,
+            response ->
+                Mono.error(
+                    new BusinessException(
+                        HttpStatus.BAD_REQUEST,
+                        "No conversion rate could be calculated for provided currencies!")))
+        .onStatus(
+                HttpStatus::is5xxServerError,
+                response ->
+                    Mono.error(
+                        new BusinessException(
+                            HttpStatus.BAD_GATEWAY,
+                            "Rate provider connection failing!")))
         .bodyToMono(ApiResponse.class)
         .log()
         .map(r -> Optional.ofNullable(r.getRates().get(to)));

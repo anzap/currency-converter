@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.itembase.currencyconverter.config.AppConfig.RandomGenerator;
 import com.itembase.currencyconverter.dtos.ConversionRequest;
 import com.itembase.currencyconverter.dtos.ConversionResponse;
+import com.itembase.currencyconverter.exceptions.BusinessException;
 import com.itembase.currencyconverter.providers.CurrencyConversionRateProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +46,7 @@ public class CurrencyConverterService {
         @Override
         public ConversionResponse apply(ConversionRequest request, Optional<BigDecimal> rate) {
           if (rate.isEmpty()) {
-        	  throw new RuntimeException("No rate provided!");
+        	  throw new BusinessException(HttpStatus.BAD_REQUEST, "No conversion rate could be calculated for provided currencies!");
           }
 
           return new ConversionResponse(

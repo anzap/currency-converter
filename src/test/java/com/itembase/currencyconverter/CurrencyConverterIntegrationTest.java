@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -67,6 +68,11 @@ public class CurrencyConverterIntegrationTest {
     wireMockServer = new WireMockServer(wireMockConfig().port(9999));
     wireMockServer.start();
     configureFor("localhost", wireMockServer.port());
+  }
+
+  @BeforeEach
+  void cleanup() {
+    wireMockServer.resetAll();
   }
 
   @AfterAll
@@ -200,7 +206,9 @@ public class CurrencyConverterIntegrationTest {
             .willReturn(
                 aResponse()
                     .withStatus(200)
-                    .withFixedDelay(1000) // Adding 1 second delay here, more than 500 millis timeout setting defined in application-test.properties
+                    .withFixedDelay(
+                        1000) // Adding 1 second delay here, more than 500 millis timeout setting
+                    // defined in application-test.properties
                     .withHeader("Content-Type", "application/json")
                     .withBody(
                         "{\"base\":\"USD\",\"date\":\"2020-07-22\",\"time_last_updated\":1595376245,\"rates\":{\"USD\":1,\"EUR\":0.87}}")));
@@ -236,21 +244,15 @@ public class CurrencyConverterIntegrationTest {
         .jsonPath("$.converted")
         .isEqualTo("0.9");
   }
-  
-  @Test
-  void allProvidersFAilure() {
 
-    stubFor(
-        get(urlEqualTo("/exchangeratesapicom/USD"))
-            .willReturn(
-                aResponse()
-                    .withStatus(500)));
+  @Test
+  void allProvidersFailure() {
+
+    stubFor(get(urlEqualTo("/exchangeratesapicom/USD")).willReturn(aResponse().withStatus(500)));
 
     stubFor(
         get(urlEqualTo("/exchangeratesapiio?base=USD&symbols=EUR"))
-            .willReturn(
-                aResponse()
-                    .withStatus(500)));
+            .willReturn(aResponse().withStatus(500)));
 
     ConversionRequest request =
         ConversionRequest.builder().from("USD").to("EUR").amount(BigDecimal.valueOf(1.0)).build();
@@ -262,5 +264,29 @@ public class CurrencyConverterIntegrationTest {
         .exchange()
         .expectStatus()
         .isEqualTo(HttpStatus.BAD_GATEWAY);
+  }
+
+  @Test
+  void invalidCurrencyProvided() {
+    stubFor(get(urlEqualTo("/exchangeratesapicom/XXX")).willReturn(aResponse().withStatus(404)));
+
+    stubFor(
+        get(urlEqualTo("/exchangeratesapiio?base=XXX&symbols=EUR"))
+            .willReturn(aResponse().withStatus(400)));
+
+    ConversionRequest request =
+        ConversionRequest.builder().from("USD").to("EUR").amount(BigDecimal.valueOf(1.0)).build();
+
+    this.client
+        .post()
+        .uri("/currency/convert")
+        .body(Mono.just(request), ConversionRequest.class)
+        .exchange()
+        .expectStatus()
+        .isEqualTo(HttpStatus.BAD_REQUEST)
+        .expectBody()
+        .jsonPath("$.message")
+        .isEqualTo(
+            "400 BAD_REQUEST \"No conversion rate could be calculated for provided currencies!\"");
   }
 }

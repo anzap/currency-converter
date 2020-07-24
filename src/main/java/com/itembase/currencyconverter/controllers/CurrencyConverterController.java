@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itembase.currencyconverter.dtos.ConversionRequest;
 import com.itembase.currencyconverter.dtos.ConversionResponse;
+import com.itembase.currencyconverter.exceptions.BusinessException;
 import com.itembase.currencyconverter.services.CurrencyConverterService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,13 @@ public class CurrencyConverterController {
     return service
         .convert(request)
         .map(r -> ResponseEntity.ok(r))
-        .onErrorReturn(ResponseEntity.status(HttpStatus.BAD_GATEWAY).build());
+//        .onErrorReturn(e -> {
+//        	if (e instanceof BusinessException) {
+//        		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//        	}
+//        	return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
+//        })
+        ;
   }
 
 }
