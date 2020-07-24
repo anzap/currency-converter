@@ -4,7 +4,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import javax.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itembase.currencyconverter.dtos.ConversionRequest;
 import com.itembase.currencyconverter.dtos.ConversionResponse;
-import com.itembase.currencyconverter.exceptions.BusinessException;
 import com.itembase.currencyconverter.services.CurrencyConverterService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,16 +33,6 @@ public class CurrencyConverterController {
       produces = APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<ConversionResponse>> convert(
       @RequestBody @Valid ConversionRequest request) {
-    return service
-        .convert(request)
-        .map(r -> ResponseEntity.ok(r))
-//        .onErrorReturn(e -> {
-//        	if (e instanceof BusinessException) {
-//        		return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-//        	}
-//        	return ResponseEntity.status(HttpStatus.BAD_GATEWAY).build();
-//        })
-        ;
+    return service.convert(request).map(r -> ResponseEntity.ok(r));
   }
-
 }

@@ -108,5 +108,8 @@ public class CurrencyConverterServiceTest {
         .expectNext(
             new ConversionResponse("USD", "EUR", BigDecimal.valueOf(1.0), BigDecimal.valueOf(0.9)))
         .verifyComplete();
+    
+    verify(exchangeRatesApiComProvider, times(1)).conversionRate(request.getFrom(), request.getTo());
+    verify(exchangeRatesApiIOProvider, times(1)).conversionRate(request.getFrom(), request.getTo());
   }
 }

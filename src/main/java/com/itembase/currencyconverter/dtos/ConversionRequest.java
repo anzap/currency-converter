@@ -18,11 +18,11 @@ import lombok.Value;
 @AllArgsConstructor
 public class ConversionRequest {
   @NotBlank(message = "Currency to convert from must be provided")
-  @Pattern(regexp = "^([A-Z]){3}$", message = "Invalid currency symbol provided")
+  @Pattern(regexp = "^([A-Z]){3}$", message = "Invalid currency symbol to convert from provided")
   private String from;
 
   @NotBlank(message = "Currency to convert to must be provided")
-  @Pattern(regexp = "^([A-Z]){3}$", message = "Invalid currency symbol provided")
+  @Pattern(regexp = "^([A-Z]){3}$", message = "Invalid currency symbol to convert to provided")
   private String to;
 
   @NotNull(message = "Amount to convert must be provided")

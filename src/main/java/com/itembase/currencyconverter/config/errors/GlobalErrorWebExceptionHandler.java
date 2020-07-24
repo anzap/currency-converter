@@ -48,10 +48,8 @@ public class GlobalErrorWebExceptionHandler extends AbstractErrorWebExceptionHan
 
     HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-    Throwable error = getError(request);
-
-    if (error instanceof BusinessException) {
-      responseStatus = ((BusinessException) error).getStatus();
+    if (errorPropertiesMap.containsKey("status")) {
+      responseStatus = (HttpStatus) errorPropertiesMap.get("status");
     }
 
     return ServerResponse.status(responseStatus)
